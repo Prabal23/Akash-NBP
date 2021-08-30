@@ -876,25 +876,31 @@ class _AttendancePageState extends State<AttendancePage> {
         isAddData = false;
       });
     } else {
-      attendanceBulk = {};
-      setState(() {
-        if (prefs.getString(attendObj) != null) {
-          attendanceBulk = json.decode(prefs.getString(attendObj));
-        }
+      if (jobAreaController.text == "") {
+        _performError("Job Area is blank!");
+      } else if (jobTypeController.text == "") {
+        _performError("Job Type is blank!");
+      } else {
+        attendanceBulk = {};
+        setState(() {
+          if (prefs.getString(attendObj) != null) {
+            attendanceBulk = json.decode(prefs.getString(attendObj));
+          }
 
-        var loadData = {
-          "job_area": jobAreaController.text,
-          "category": jobTypeController.text,
-          "lat": latitude,
-          "lon": longitude,
-          "user_name": user_name,
-          "postimage": fileImage.path
-        };
+          var loadData = {
+            "job_area": jobAreaController.text,
+            "category": jobTypeController.text,
+            "lat": latitude,
+            "lon": longitude,
+            "user_name": user_name,
+            "postimage": fileImage.path
+          };
 
-        storeToLocal(jsonEncode(loadData));
+          storeToLocal(jsonEncode(loadData));
 
-        isAddData = false;
-      });
+          isAddData = false;
+        });
+      }
     }
   }
 

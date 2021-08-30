@@ -119,49 +119,104 @@ class _SalesPageState extends State<SalesPage> {
     });
     print(user_name);
     if (!isoffline) {
-      final response = await http.post(
-        Uri.parse('https://optionone-bd.com/api/add_sales_api.php'),
-        body: {
-          'user_name': user_name,
-          'customer_name': nameController.text,
-          'cell_number': cellNumController.text,
-          'sub_id': subIDController.text,
-          'type_of_sales': typeController.text,
-          'coupon': couponNumController.text,
-          'remarks': remarksController.text,
-        },
-      );
-      var recData = json.decode(response.body);
-      print(response.body);
-      salesMsg(recData["error"]);
+      if (nameController.text == "") {
+        _performError("Customer Name is empty!");
+      } else if (cellNumController.text == "") {
+        _performError("RMN is empty!");
+      } else if (subIDController.text == "") {
+        _performError("Sub ID is empty!");
+      } else if (typeController.text == "") {
+        _performError("Type of sales is empty!");
+      } else {
+        final response = await http.post(
+          Uri.parse('https://optionone-bd.com/api/add_sales_api.php'),
+          body: {
+            'user_name': user_name,
+            'customer_name': nameController.text,
+            'cell_number': cellNumController.text,
+            'sub_id': subIDController.text,
+            'type_of_sales': typeController.text,
+            'coupon': couponNumController.text,
+            'remarks': remarksController.text,
+          },
+        );
+        var recData = json.decode(response.body);
+        print(response.body);
+        salesMsg(recData["error"]);
+      }
     } else {
       setState(() {
-        loadDataList = [];
-        if (prefs.getString(salesStored) != null) {
-          var data = json.decode(prefs.getString(salesStored));
-          for (int i = 0; i < data.length; i++) {
-            loadDataList.add(data[i]);
+        if (nameController.text == "") {
+          _performError("Customer Name is empty!");
+        } else if (cellNumController.text == "") {
+          _performError("RMN is empty!");
+        } else if (subIDController.text == "") {
+          _performError("Sub ID is empty!");
+        } else if (typeController.text == "") {
+          _performError("Type of sales is empty!");
+        } else {
+          loadDataList = [];
+          if (prefs.getString(salesStored) != null) {
+            var data = json.decode(prefs.getString(salesStored));
+            for (int i = 0; i < data.length; i++) {
+              loadDataList.add(data[i]);
+            }
           }
+
+          var loadData = {
+            'user_name': user_name,
+            'customer_name': nameController.text,
+            'cell_number': cellNumController.text,
+            'sub_id': subIDController.text,
+            'type_of_sales': typeController.text,
+            'coupon': couponNumController.text,
+            'remarks': remarksController.text,
+          };
+          loadDataList.add(loadData);
+
+          storeToLocal(jsonEncode(loadDataList));
         }
-
-        var loadData = {
-          'user_name': user_name,
-          'customer_name': nameController.text,
-          'cell_number': cellNumController.text,
-          'sub_id': subIDController.text,
-          'type_of_sales': typeController.text,
-          'coupon': couponNumController.text,
-          'remarks': remarksController.text,
-        };
-        loadDataList.add(loadData);
-
-        storeToLocal(jsonEncode(loadDataList));
       });
     }
 
     setState(() {
       isAddData = false;
     });
+  }
+
+  _performError(String msg) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return Container(
+            padding: EdgeInsets.only(left: 20, right: 20),
+            decoration: BoxDecoration(
+              color: Colors.redAccent,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(10),
+                topRight: const Radius.circular(10),
+              ),
+            ),
+            height: 70,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 17, color: Colors.white),
+                Container(
+                  margin: EdgeInsets.only(left: 10),
+                  child: Text(
+                    msg,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                        fontSize: 15),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   Future<Null> _selectDate(BuildContext context) async {

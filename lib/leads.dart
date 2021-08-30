@@ -39,7 +39,6 @@ class _LeadsPageState extends State<LeadsPage> {
   List serviceProvItems = [
     "None",
     "Cable (Local Dish Service)",
-    "Select service provider",
     "Internet TV (Bioscope, Toffee, IPTV etc)",
     "Digital Content (Youtube, Netflix et)"
   ];
@@ -889,29 +888,22 @@ class _LeadsPageState extends State<LeadsPage> {
                                       //validator: _validateEmail,
                                     ),
                                     new Divider(color: Colors.grey),
-                                    GestureDetector(
-                                      onTap: () {
-                                        typeOfSalesItems();
-                                      },
-                                      child: Container(
-                                        child: TextFormField(
-                                          controller: feedbackController,
-                                          autofocus: false,
-                                          enabled: false,
-                                          //initialValue: 'prabal@gmail.com',
-                                          decoration: InputDecoration(
-                                            hintText: 'Customer Feedback',
-                                            //hintStyle: TextStyle(color: Colors.black38),
-                                            labelText:
-                                                'Select Customer Feedback',
-                                            labelStyle: TextStyle(
-                                                color: Color(0xFF1B8E99)),
-                                            contentPadding: EdgeInsets.fromLTRB(
-                                                0.0, 10.0, 20.0, 10.0),
-                                            border: InputBorder.none,
-                                          ),
-                                          //validator: _validateEmail,
+                                    Container(
+                                      child: TextFormField(
+                                        controller: feedbackController,
+                                        autofocus: false,
+                                        //initialValue: 'prabal@gmail.com',
+                                        decoration: InputDecoration(
+                                          hintText: 'Customer Feedback',
+                                          //hintStyle: TextStyle(color: Colors.black38),
+                                          labelText: 'Select Customer Feedback',
+                                          labelStyle: TextStyle(
+                                              color: Color(0xFF1B8E99)),
+                                          contentPadding: EdgeInsets.fromLTRB(
+                                              0.0, 10.0, 20.0, 10.0),
+                                          border: InputBorder.none,
                                         ),
+                                        //validator: _validateEmail,
                                       ),
                                     ),
                                     new Divider(color: Colors.grey),
@@ -1040,57 +1032,116 @@ class _LeadsPageState extends State<LeadsPage> {
     });
     print(user_name);
     if (!isoffline) {
-      final response = await http.post(
-        Uri.parse('https://optionone-bd.com/api/add_leads_api.php'),
-        body: {
-          'user_name': user_name,
-          'customer_name': nameController.text,
-          'cell_number': cellController.text,
-          'thana': thanaController.text,
-          'district': districtController.text,
-          'feedback': feedbackController.text,
-          'date': pdpController.text,
-          'service_type': serviceProController.text,
-          'service_price': servicePriceController.text,
-          'number_of_tv': numTVController.text,
-          'remarks': remarksController.text,
-        },
-      );
-      var recData = json.decode(response.body);
-      print(response.body);
-      leadsMsg(recData["error"]);
+      if (nameController.text == "") {
+        _performError("Customer name is empty!");
+      } else if (cellController.text == "") {
+        _performError("Customer Phone Number is empty!");
+      } else if (serviceProController.text == "") {
+        _performError("Customer Service Provider is empty!");
+      } else if (thanaController.text == "") {
+        _performError("Thana is empty!");
+      } else if (districtController.text == "") {
+        _performError("District is empty!");
+      } else {
+        final response = await http.post(
+          Uri.parse('https://optionone-bd.com/api/add_leads_api.php'),
+          body: {
+            'user_name': user_name,
+            'customer_name': nameController.text,
+            'cell_number': cellController.text,
+            'thana': thanaController.text,
+            'district': districtController.text,
+            'feedback': feedbackController.text,
+            'date': pdpController.text,
+            'service_type': serviceProController.text,
+            'service_price': servicePriceController.text,
+            'number_of_tv': numTVController.text,
+            'remarks': remarksController.text,
+          },
+        );
+        var recData = json.decode(response.body);
+        print(response.body);
+        leadsMsg(recData["error"]);
+      }
     } else {
       setState(() {
-        loadDataList = [];
-        if (prefs.getString(leadsStored) != null) {
-          var data = json.decode(prefs.getString(leadsStored));
-          for (int i = 0; i < data.length; i++) {
-            loadDataList.add(data[i]);
+        if (nameController.text == "") {
+          _performError("Customer name is empty!");
+        } else if (cellController.text == "") {
+          _performError("Customer Phone Number is empty!");
+        } else if (serviceProController.text == "") {
+          _performError("Customer Service Provider is empty!");
+        } else if (thanaController.text == "") {
+          _performError("Thana is empty!");
+        } else if (districtController.text == "") {
+          _performError("District is empty!");
+        } else {
+          loadDataList = [];
+          if (prefs.getString(leadsStored) != null) {
+            var data = json.decode(prefs.getString(leadsStored));
+            for (int i = 0; i < data.length; i++) {
+              loadDataList.add(data[i]);
+            }
           }
+
+          var loadData = {
+            'user_name': user_name,
+            'customer_name': nameController.text,
+            'cell_number': cellController.text,
+            'thana': thanaController.text,
+            'district': districtController.text,
+            'feedback': feedbackController.text,
+            'date': pdpController.text,
+            'service_type': serviceProController.text,
+            'service_price': servicePriceController.text,
+            'number_of_tv': numTVController.text,
+            'remarks': remarksController.text,
+          };
+          loadDataList.add(loadData);
+
+          storeToLocal(jsonEncode(loadDataList));
         }
-
-        var loadData = {
-          'user_name': user_name,
-          'customer_name': nameController.text,
-          'cell_number': cellController.text,
-          'thana': thanaController.text,
-          'district': districtController.text,
-          'feedback': feedbackController.text,
-          'date': pdpController.text,
-          'service_type': serviceProController.text,
-          'service_price': servicePriceController.text,
-          'number_of_tv': numTVController.text,
-          'remarks': remarksController.text,
-        };
-        loadDataList.add(loadData);
-
-        storeToLocal(jsonEncode(loadDataList));
       });
     }
 
     setState(() {
       isAddData = false;
     });
+  }
+
+  _performError(String msg) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return Container(
+            padding: EdgeInsets.only(left: 20, right: 20),
+            decoration: BoxDecoration(
+              color: Colors.redAccent,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(10),
+                topRight: const Radius.circular(10),
+              ),
+            ),
+            height: 70,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 17, color: Colors.white),
+                Container(
+                  margin: EdgeInsets.only(left: 10),
+                  child: Text(
+                    msg,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                        fontSize: 15),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
   }
 
   void leadsMsg(String msg) {
