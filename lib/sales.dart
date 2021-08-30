@@ -29,7 +29,7 @@ class _SalesPageState extends State<SalesPage> {
   TextEditingController typeController = new TextEditingController();
   TextEditingController couponNumController = new TextEditingController();
   TextEditingController remarksController = new TextEditingController();
-  var salesList, bestPerformerList;
+  var salesList = [], bestPerformerList = [];
   bool isLoading = true,
       nodata = false,
       bestPerformerNoData = false,
@@ -109,6 +109,7 @@ class _SalesPageState extends State<SalesPage> {
       setState(() {
         bestPerformerNoData = true;
         isLoading = false;
+        bestPerformerList = [];
       });
     }
   }
@@ -1358,7 +1359,7 @@ class _SalesPageState extends State<SalesPage> {
         salesMsg("All data synced successfully!");
         await prefs.remove(salesStored);
       } else {
-        salesMsg("Attendance already done!");
+        // salesMsg("Attendance already done!");
         await prefs.remove(salesStored);
       }
       setState(() {

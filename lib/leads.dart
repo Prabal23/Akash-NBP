@@ -896,7 +896,7 @@ class _LeadsPageState extends State<LeadsPage> {
                                         decoration: InputDecoration(
                                           hintText: 'Customer Feedback',
                                           //hintStyle: TextStyle(color: Colors.black38),
-                                          labelText: 'Select Customer Feedback',
+                                          labelText: 'Enter Customer Feedback',
                                           labelStyle: TextStyle(
                                               color: Color(0xFF1B8E99)),
                                           contentPadding: EdgeInsets.fromLTRB(
@@ -1017,7 +1017,7 @@ class _LeadsPageState extends State<LeadsPage> {
         leadsMsg("All data synced successfully!");
         await prefs.remove(leadsStored);
       } else {
-        leadsMsg("Attendance already done!");
+        // leadsMsg("Attendance already done!");
         await prefs.remove(leadsStored);
       }
       setState(() {
